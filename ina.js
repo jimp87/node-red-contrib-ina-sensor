@@ -18,35 +18,44 @@ module.exports = function (RED) {
 		node.on('input', function (msg) {
 			// Write to the Configuration Register
 			// 0x4427 means 16 averages, 1.1ms conversion time, shunt and bus continuous
-			try {
-				ina.writeRegister(CONFIGURATION_REGISTER, 0x4427)
-					.then(function () {
-						ina.readBusVoltage()
-							.then(function (busVoltage) {
-								v = busVoltage.toFixed(2);
-								// console.log(v);
-							});
-						ina.readShuntVoltage()
-							.then(function () {
-								var current = ina.calcCurrent();
-								c = current.toFixed(2);
-								// console.log(c);
-							})
-							.then(ina.readBusVoltage.bind(ina))
-							.then(function () {
-								var power = ina.calcPower();
-								p = power.toFixed(2);
-								// console.log(p);
-							})
-							.then(function () {
-								//console.log(v + " " + c + " " + p);
-								msg.payload = { "v": v, "c": c, "p": p };
-								node.send(msg);
-							});
-					});
-			} catch (e) {
-				console.log("INA Sensor error", e);
-			}
+			ina.writeRegister(CONFIGURATION_REGISTER, 0x4427)
+				.then(function () {
+
+					ina.readBusVoltage()
+						.then(function (busVoltage) {
+							v = busVoltage.toFixed(2);
+							// console.log(v);
+						}).catch(e => {
+							// read bus voltage error
+							console.log("INA Sensor error", e);
+						});
+
+					ina.readShuntVoltage()
+						.then(function () {
+							var current = ina.calcCurrent();
+							c = current.toFixed(2);
+							// console.log(c);
+						})
+						.then(ina.readBusVoltage.bind(ina))
+						.then(function () {
+							var power = ina.calcPower();
+							p = power.toFixed(2);
+							// console.log(p);
+						})
+						.then(function () {
+							//console.log(v + " " + c + " " + p);
+							msg.payload = { "v": v, "c": c, "p": p };
+							node.send(msg);
+						}).catch(e => {
+							// Read shunt voltage
+							console.log("INA Sensor error reading shunt voltage", e);
+						});
+
+				}).catch(e => {
+					// write register error
+					console.log("INA Sensor error writing register", e);
+				});
+
 		});
 	}
 	RED.nodes.registerType('ina226-sensor', inaSensor)
