@@ -39,11 +39,13 @@ module.exports = function(RED)
 				  // console.log(p);
 				})
 				.then(function(){
-	                       	  console.log(v + " " + c + " " + p);
+	                       	  //console.log(v + " " + c + " " + p);
 				  msg.payload = { "v": v, "c": c, "p": p };
             			  node.send(msg);
 				});
-			});
+			}).catch((e) => {
+                                console.log("INA Sensor error",e);
+                        });
         	});
     	}
 	RED.nodes.registerType('ina226-sensor', inaSensor)
