@@ -44,8 +44,7 @@ module.exports = function(RED)
                                   node.send(msg);
                                 });
                         }).catch((e) => {
-                                console.log("INA Sensor error");
-                                console.log(e);
+                                console.log("INA Sensor error",e);
                         });
                 });
         }
