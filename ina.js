@@ -25,7 +25,8 @@ module.exports = function (RED) {
 						.then(function (busVoltage) {
 							v = busVoltage.toFixed(2);
 							// console.log(v);
-						}).catch(e => {
+						})
+						.catch(e => {
 							// read bus voltage error
 							console.log("INA Sensor error", e);
 						});
@@ -46,7 +47,8 @@ module.exports = function (RED) {
 							//console.log(v + " " + c + " " + p);
 							msg.payload = { "v": v, "c": c, "p": p };
 							node.send(msg);
-						}).catch(e => {
+						})
+						.catch(e => {
 							// Read shunt voltage
 							console.log("INA Sensor error reading shunt voltage", e);
 						});
